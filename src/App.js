@@ -1,4 +1,4 @@
-import {useState, useRef } from 'react';
+import {useState, useRef, useEffect, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import SearchBar from './components/SearchBar';
 import Gallery from './components/Gallery';
@@ -6,8 +6,12 @@ import { DataContext } from './contexts/DataContexts';
 import { SearchContext } from './contexts/SearchContext';
 import AlbumView from './components/AlbumView';
 import ArtistView from './components/ArtistView';
+import { createResource as fetchData } from './helper';
+import Spinner from './components/Spinner';
+
 
 import './App.css';
+import Spinner from './components/Spinner';
 
 function App() {
   let [search, setSearch] = useState('');
@@ -32,6 +36,12 @@ function App() {
     }
     fetchData();
   }
+  useEffect(() => {
+    if (searchTerm) {
+        setData(fetchData(searchTerm))
+    }
+}, [searchTerm])
+
 
 
   return (
@@ -53,7 +63,12 @@ function App() {
       <DataContext.Provider value={ {data, setSearch}}>
       
       {message}
+  
+      <Suspense fallback = {<Spinner/>}>
         <Gallery />
+        </Suspense>
+      
+        
       </DataContext.Provider>
             </>
 
